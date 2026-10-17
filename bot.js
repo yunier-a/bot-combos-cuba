@@ -6,7 +6,6 @@ const path = require('path');
 const bot = new Telegraf('8716309397:AAHO3DtPCWe4OSBjgx39EgP6rlqVF3FOj78');
 
 // ⚠️ REEMPLAZA AQUÍ EL ID DE TU GRUPO DE ADMINISTRADORES (Debe ser un número negativo, ej: -1001234567890)
-// Al usar un grupo de Telegram, todos los administradores recibirán los pedidos con alerta de sonido y podrán aprobarlos al instante.
 const ADMIN_CHAT_ID = '-1004266293162'; 
 
 bot.use(session());
@@ -383,7 +382,6 @@ bot.use((ctx, next) => {
   return next();
 });
 
-// Pantalla de Bienvenida con Banner Local y Opción "Mis Pedidos"
 bot.start(async (ctx) => {
   ctx.session.paso = null;
   const bannerPath = path.join(__dirname, 'images', 'banner.jpg');
@@ -728,8 +726,8 @@ bot.on('photo', async (ctx) => {
       parse_mode: 'Markdown',
       ...Markup.inlineKeyboard([
         [
-          Markup.button.callback('✅ Aprobar Pago', `aprobar_${clienteId}_${ordenId}`),
-          Markup.button.callback('❌ Rechazar', `rechazar_${clienteId}_${ordenId}`)
+          Markup.button.callback('✅ Aprobar Pago', 'aprobar_' + clienteId + '_' + ordenId),
+          Markup.button.callback('❌ Rechazar', 'rechazar_' + clienteId + '_' + ordenId)
         ]
       ])
     });
@@ -800,10 +798,10 @@ bot.action(/aprobar_(.+)_(.+)/, async (ctx) => {
       {
         parse_mode: 'Markdown',
         ...Markup.inlineKeyboard([
-          [Markup.button.callback('🚚 Marcar En Camino', `camino_${clienteId}_${ordenId}`)],
-          [Markup.button.callback('✅ Marcar Entregado', `entregado_${clienteId}_${ordenId}`)]
-        ]
-      })
+          [Markup.button.callback('🚚 Marcar En Camino', 'camino_' + clienteId + '_' + ordenId)],
+          [Markup.button.callback('✅ Marcar Entregado', 'entregado_' + clienteId + '_' + ordenId)]
+        ])
+      }
     );
   } catch (e) {
     await ctx.reply('⚠️ Error al notificar al cliente.');
@@ -823,7 +821,7 @@ bot.action(/camino_(.+)_(.+)/, async (ctx) => {
   await ctx.editMessageCaption(`🚚 *Orden ${ordenId} marcada como "En camino".*`, {
     parse_mode: 'Markdown',
     ...Markup.inlineKeyboard([
-      [Markup.button.callback('✅ Marcar Entregado ahora', `entregado_${clienteId}_${ordenId}`)]
+      [Markup.button.callback('✅ Marcar Entregado ahora', 'entregado_' + clienteId + '_' + ordenId)]
     ])
   });
 });
@@ -860,7 +858,7 @@ bot.action(/rechazar_(.+)_(.+)/, async (ctx) => {
   }
 
   await bot.telegram.sendMessage(clienteId, `❌ *Tu comprobante del pedido ${ordenId} fue rechazado.* Contacta a soporte.`, { parse_mode: 'Markdown' });
-  await ctx.editMessageCaption(`❌ *Pago rechazado para la orden ${ordenId}.*`, { parse_mode: 'Markdown' });
+    await ctx.editMessageCaption(`❌ *Pago rechazado para la orden ${ordenId}.*`, { parse_mode: 'Markdown' });
 });
 
 bot.action('volver_inicio', (ctx) => {
