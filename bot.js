@@ -358,7 +358,7 @@ const PRODUCTOS = {
   con_63: { id: 'con_63', cat: 'conservas', nombre: 'Compota de macedonia YEYA (113 g)', marca: 'YEYA', precioBaseUSD: 1.25, imagen: './images/conservas.jpg' },
   con_64: { id: 'con_64', cat: 'conservas', nombre: 'Pasta de guayaba en barra YEYA (400 g)', marca: 'YEYA', precioBaseUSD: 2.45, imagen: './images/conservas.jpg' },
   con_65: { id: 'con_65', cat: 'conservas', nombre: 'Tronchos en salmuera YEYA (425 g)', marca: 'YEYA', precioBaseUSD: 3.35, imagen: './images/conservas.jpg' },
-  con_66: { id: 'con_66', cat: 'conservas', nombre: 'Atún en trozos en aceite vegetal YEYA (160 g)', marca: 'YEYA', precioBaseUSD: 2.40, imagen: './images/conservas.jpg' },
+  con_66: { id: 'con_66', cat: 'conservas', nombre: 'Atún desmenuzado en aceite vegetal YEYA (160 g)', marca: 'YEYA', precioBaseUSD: 2.40, imagen: './images/conservas.jpg' },
   con_67: { id: 'con_67', cat: 'conservas', nombre: 'Tronchos en salsa de tomate YEYA (425 g)', marca: 'YEYA', precioBaseUSD: 3.70, imagen: './images/conservas.jpg' },
   ali_16: { id: 'ali_16', cat: 'conservas', nombre: 'Tronchos en salsa de tomate YEYA (425 g)', marca: 'YEYA', precioBaseUSD: 3.70, imagen: './images/conservas.jpg' },
   ali_37: { id: 'ali_37', cat: 'conservas', nombre: 'Pasta de tomate concentrada YEYA (400 g)', marca: 'YEYA', precioBaseUSD: 1.35, imagen: './images/conservas.jpg' },
@@ -369,7 +369,6 @@ const PRODUCTOS = {
 
 // Base de datos temporal en memoria para "Mis Pedidos"
 const PEDIDOS_USUARIOS = {}; 
-// Estructura: { userId: [ { id: 'PED-1234', estado: '⏳ En espera (Verificando pago)', total: '150 RUB', fecha: '...' } ] }
 
 function obtenerPrecio(prod, provincia, moneda) {
   const precioUSD = prod.precioBaseUSD;
@@ -671,15 +670,15 @@ metodosPagoValidos.forEach(metodo => {
     if (metodo === 'RUB') {
       instrucciones = `🇷🇺 *Instrucciones de Pago en Rublos (RUB):*\n• Importe exacto a transferir: \`${totalPagar} RUB\`\n• SBP al número: \`+79252481911\` (Bancos: *T-Bank* o *VTB*)\n• Transferencia directa a tarjeta: \`2200 7010 4388 5190\``;
     } else if (metodo === 'CUP' || metodo === 'MLC') {
-      instrucciones = `🇨🇺 *Instrucciones de Pago en Cuba (${metodo}):*\n• Importe exacto a transferir: \`${totalPagar} ${mon}\`\n• Transferencia a tarjeta CUP: \`9204 1299 7694 7558\`\n• Confirmar pago al número en Cuba: *+5351849868*`;
+      instrucciones = `🇨🇺 *Instrucciones de Pago en Cuba (${metodo}):*\n• Importe exacto a transferir: \`${totalPagar}${mon}\`\n• Transferencia a tarjeta CUP: \`9204 1299 7694 7558\`\n• Confirmar pago al número en Cuba: *+5351849868*`;
     } else {
-      instrucciones = `💳 *Método ${metodo}:* Importe a pagar: \`${totalPagar} ${mon}\`. Contáctenos a nuestro WhatsApp para coordinar.`;
+      instrucciones = `💳 *Método ${metodo}:* Importe a pagar: \`${totalPagar}${mon}\`. Contáctenos a nuestro WhatsApp para coordinar.`;
     }
 
     await ctx.editMessageText(
       `📸 *PASO FINAL: COMPROBANTE DE PAGO*\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       instrucciones + `\n\n` +
-      `⚠️ *IMPORTANTE:* Por favor, toma una captura de pantalla de tu transferencia exitosa por el monto exacto de \`${totalPagar} ${mon}\` y **envíala aquí como foto** al chat.`,
+      `⚠️ *IMPORTANTE:* Por favor, toma una captura de pantalla de tu transferencia exitosa por el monto exacto de \`${totalPagar}${mon}\` y **envíala aquí como foto** al chat.`,
       { parse_mode: 'Markdown' }
     );
   });
@@ -727,7 +726,7 @@ bot.on('photo', async (ctx) => {
         `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 Cliente: @${ctx.from.username || ctx.from.first_name} (ID: \`${clienteId}\`)\n` +
         `📍 Destino: ${prov}\n` +
-        `💳 Método: ${metodo} | 💰 *Total:* \`${totalPagar} ${moneda}\`\n\n` +
+        `💳 Método: ${metodo} | 💰 *Total:* \`${totalPagar}${moneda}\`\n\n` +
         `🏠 *Entrega:* ${ctx.session.datosEntrega}\n\n` +
         `¿Aprobar este pago y registrar pedido?`,
       parse_mode: 'Markdown',
