@@ -5,8 +5,9 @@ const path = require('path');
 // ⚠️ REEMPLAZA AQUÍ TU TOKEN DE TELEGRAM (Obtenido de @BotFather)
 const bot = new Telegraf('8716309397:AAHO3DtPCWe4OSBjgx39EgP6rlqVF3FOj78');
 
-// ⚠️ REEMPLAZA AQUÍ TU ID DE TELEGRAM DE ADMINISTRADOR
-const ADMIN_CHAT_ID = '7227146153'; 
+// ⚠️ REEMPLAZA AQUÍ EL ID DE TU GRUPO DE ADMINISTRADORES (Debe ser un número negativo, ej: -1001234567890)
+// Al usar un grupo de Telegram, todos los administradores recibirán los pedidos con alerta de sonido y podrán aprobarlos al instante.
+const ADMIN_CHAT_ID = '-1004266293162'; 
 
 bot.use(session());
 
@@ -86,8 +87,8 @@ const PRODUCTOS = {
   arr_26: { id: 'arr_26', cat: 'arroz', nombre: 'Arroz blanco pulido tipo 1 Norte (500 g)', marca: 'Norte', precioBaseUSD: 1.10, imagen: './images/arroz.jpg' },
   ali_4: { id: 'ali_4', cat: 'arroz', nombre: 'Azúcar blanca granulada YEYA (5 kg)', marca: 'YEYA', precioBaseUSD: 12.35, imagen: './images/azucar.jpg' },
   ali_7: { id: 'ali_7', cat: 'arroz', nombre: 'Azúcar blanca granulada YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.70, imagen: './images/azucar.jpg' },
-  ali_24: { id: 'ali_24', cat: 'arroz', nombre: 'Arroz blanco de grano largo YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.65, imagen: './images/azucar.jpg' },
-  ali_33: { id: 'ali_33', cat: 'arroz', nombre: 'Arroz blanco grano largo tailandés YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.90, imagen: './images/azucar.jpg' },
+  ali_24: { id: 'ali_24', cat: 'arroz', nombre: 'Arroz blanco de grano largo YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.65, imagen: './images/arroz.jpg' },
+  ali_33: { id: 'ali_33', cat: 'arroz', nombre: 'Arroz blanco grano largo tailandés YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.90, imagen: './images/arroz.jpg' },
 
   gra_1: { id: 'gra_1', cat: 'granos', nombre: 'Frijol blanco Penelas (500 g)', marca: 'Penelas', precioBaseUSD: 3.65, imagen: './images/granos.jpg' },
   gra_2: { id: 'gra_2', cat: 'granos', nombre: 'Arvejas verdes partidas / chícharos (500 g)', marca: 'Los Granos', precioBaseUSD: 2.30, imagen: './images/granos.jpg' },
@@ -367,8 +368,7 @@ const PRODUCTOS = {
   hue_1: { id: 'hue_1', cat: 'huevo', nombre: 'Cartón de Huevos Super Yu (30 unidades)', marca: 'Super Yu', precioBaseUSD: 23.35, imagen: './images/huevos.jpg' }
 };
 
-// Base de datos temporal en memoria para "Mis Pedidos"
-const PEDIDOS_USUARIOS = {}; 
+const PEDIDOS_USUARIOS = {};
 
 function obtenerPrecio(prod, provincia, moneda) {
   const precioUSD = prod.precioBaseUSD;
@@ -629,7 +629,6 @@ bot.on('text', (ctx) => {
     ctx.session.datosEntrega = ctx.message.text;
     ctx.session.paso = null;
 
-    // Calcular el total para mostrarlo de forma prominente en el paso de pago
     const prov = ctx.session.provincia;
     const mon = ctx.session.moneda;
     let total = 0;
@@ -656,7 +655,6 @@ bot.on('text', (ctx) => {
   }
 });
 
-// FLUJO DE PAGO E INSTRUCCIONES AUTOMÁTICAS CON IMPORTE CLARO
 const metodosPagoValidos = ['CUP', 'MLC', 'CLASICA', 'USDT', 'RUB', 'USD'];
 metodosPagoValidos.forEach(metodo => {
   bot.action('pago_' + metodo, async (ctx) => {
@@ -670,21 +668,20 @@ metodosPagoValidos.forEach(metodo => {
     if (metodo === 'RUB') {
       instrucciones = `🇷🇺 *Instrucciones de Pago en Rublos (RUB):*\n• Importe exacto a transferir: \`${totalPagar} RUB\`\n• SBP al número: \`+79252481911\` (Bancos: *T-Bank* o *VTB*)\n• Transferencia directa a tarjeta: \`2200 7010 4388 5190\``;
     } else if (metodo === 'CUP' || metodo === 'MLC') {
-      instrucciones = `🇨🇺 *Instrucciones de Pago en Cuba (${metodo}):*\n• Importe exacto a transferir: \`${totalPagar}${mon}\`\n• Transferencia a tarjeta CUP: \`9204 1299 7694 7558\`\n• Confirmar pago al número en Cuba: *+5351849868*`;
+      instrucciones = `🇨🇺 *Instrucciones de Pago en Cuba (${metodo}):*\n• Importe exacto a transferir: \`${totalPagar} ${mon}\`\n• Transferencia a tarjeta CUP: \`9204 1299 7694 7558\`\n• Confirmar pago al número en Cuba: *+5351849868*`;
     } else {
-      instrucciones = `💳 *Método ${metodo}:* Importe a pagar: \`${totalPagar}${mon}\`. Contáctenos a nuestro WhatsApp para coordinar.`;
+      instrucciones = `💳 *Método ${metodo}:* Importe a pagar: \`${totalPagar} ${mon}\`. Contáctenos a nuestro WhatsApp para coordinar.`;
     }
 
     await ctx.editMessageText(
       `📸 *PASO FINAL: COMPROBANTE DE PAGO*\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       instrucciones + `\n\n` +
-      `⚠️ *IMPORTANTE:* Por favor, toma una captura de pantalla de tu transferencia exitosa por el monto exacto de \`${totalPagar}${mon}\` y **envíala aquí como foto** al chat.`,
+      `⚠️ *IMPORTANTE:* Por favor, toma una captura de pantalla de tu transferencia exitosa por el monto exacto de \`${totalPagar} ${mon}\` y **envíala aquí como foto** al chat.`,
       { parse_mode: 'Markdown' }
     );
   });
 });
 
-// CAPTURAR LA FOTO DEL COMPROBANTE Y ENVIARLA AL ADMIN
 bot.on('photo', async (ctx) => {
   if (ctx.session.paso === 'esperando_comprobante') {
     const fotoId = ctx.message.photo[ctx.message.photo.length - 1].file_id;
@@ -702,7 +699,6 @@ bot.on('photo', async (ctx) => {
       detalle += `- ${cant}x ${p.nombre} (${sub} ${moneda})\n`;
     });
 
-    // Crear registro en "Mis Pedidos" con estado inicial
     const ordenId = 'PED-' + Math.floor(1000 + Math.random() * 9000);
     if (!PEDIDOS_USUARIOS[clienteId]) {
       PEDIDOS_USUARIOS[clienteId] = [];
@@ -717,16 +713,16 @@ bot.on('photo', async (ctx) => {
     PEDIDOS_USUARIOS[clienteId].push(nuevoPedido);
 
     ctx.session.paso = null;
-    ctx.session.carrito = {}; // Limpiar carrito tras registrar pedido
+    ctx.session.carrito = {};
 
-    // Enviar foto al Administrador con botones de control
+    // Envía la foto al Grupo de Administradores con alerta de sonido y botones interactivos
     await bot.telegram.sendPhoto(ADMIN_CHAT_ID, fotoId, {
       caption: 
         `🚨 *NUEVO COMPROBANTE DE PAGO (${ordenId})*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 Cliente: @${ctx.from.username || ctx.from.first_name} (ID: \`${clienteId}\`)\n` +
         `📍 Destino: ${prov}\n` +
-        `💳 Método: ${metodo} | 💰 *Total:* \`${totalPagar}${moneda}\`\n\n` +
+        `💳 Método: ${metodo} | 💰 *Total:* \`${totalPagar} ${moneda}\`\n\n` +
         `🏠 *Entrega:* ${ctx.session.datosEntrega}\n\n` +
         `¿Aprobar este pago y registrar pedido?`,
       parse_mode: 'Markdown',
@@ -752,7 +748,6 @@ bot.on('photo', async (ctx) => {
   }
 });
 
-// OPCIÓN: "MIS PEDIDOS" (VER ESTADOS EN TIEMPO REAL)
 bot.action('mis_pedidos', async (ctx) => {
   const clienteId = ctx.from.id;
   const pedidos = PEDIDOS_USUARIOS[clienteId] || [];
@@ -780,12 +775,10 @@ bot.action('mis_pedidos', async (ctx) => {
   });
 });
 
-// CUANDO EL ADMIN APRUEBA EL PAGO (Pasa a "En preparación" y avisa al cliente)
 bot.action(/aprobar_(.+)_(.+)/, async (ctx) => {
   const clienteId = ctx.match[1];
   const ordenId = ctx.match[2];
 
-  // Actualizar estado en Mis Pedidos
   if (PEDIDOS_USUARIOS[clienteId]) {
     const ped = PEDIDOS_USUARIOS[clienteId].find(p => p.id === ordenId);
     if (ped) ped.estado = '🔄 Procesando / En preparación';
@@ -802,23 +795,21 @@ bot.action(/aprobar_(.+)_(.+)/, async (ctx) => {
       { parse_mode: 'Markdown' }
     );
 
-    // Permitir al admin actualizar la orden a "En camino" o "Entregado"
     await ctx.editMessageCaption(
-      `✅ *Orden ${ordenId} Aprobada.*\nSelecciona el siguiente avance para notificar al cliente:`,
+      `✅ *Orden ${ordenId} Aprobada por @${ctx.from.username || ctx.from.first_name}.*\nSelecciona el siguiente avance para notificar al cliente:`,
       {
         parse_mode: 'Markdown',
         ...Markup.inlineKeyboard([
           [Markup.button.callback('🚚 Marcar En Camino', `camino_${clienteId}_${ordenId}`)],
           [Markup.button.callback('✅ Marcar Entregado', `entregado_${clienteId}_${ordenId}`)]
-        ])
-      }
+        ]
+      })
     );
   } catch (e) {
     await ctx.reply('⚠️ Error al notificar al cliente.');
   }
 });
 
-// ADMIN: MARCAR COMO EN CAMINO
 bot.action(/camino_(.+)_(.+)/, async (ctx) => {
   const clienteId = ctx.match[1];
   const ordenId = ctx.match[2];
@@ -837,7 +828,6 @@ bot.action(/camino_(.+)_(.+)/, async (ctx) => {
   });
 });
 
-// ADMIN: MARCAR COMO ENTREGADO (Notifica éxito absoluto a la familia/usuario)
 bot.action(/entregado_(.+)_(.+)/, async (ctx) => {
   const clienteId = ctx.match[1];
   const ordenId = ctx.match[2];
@@ -882,4 +872,4 @@ bot.action('volver_inicio', (ctx) => {
 });
 
 bot.launch();
-console.log('🤖 ¡Bot actualizado con Importe Total Visible y Módulo de Mis Pedidos!');
+console.log('🤖 ¡Bot configurado para Grupo de Administradores con alerta y validación en equipo!');
