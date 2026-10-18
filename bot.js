@@ -87,8 +87,8 @@ const PRODUCTOS = {
   arr_26: { id: 'arr_26', cat: 'arroz', nombre: 'Arroz blanco pulido tipo 1 Norte (500 g)', marca: 'Norte', precioBaseUSD: 1.10, imagen: './images/arroz.jpg' },
   ali_4: { id: 'ali_4', cat: 'arroz', nombre: 'Azúcar blanca granulada YEYA (5 kg)', marca: 'YEYA', precioBaseUSD: 12.35, imagen: './images/azucar.jpg' },
   ali_7: { id: 'ali_7', cat: 'arroz', nombre: 'Azúcar blanca granulada YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.70, imagen: './images/azucar.jpg' },
-  ali_24: { id: 'ali_24', cat: 'arroz', nombre: 'Arroz blanco de grano largo YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.65, imagen: './images/arroz.jpg' },
-  ali_33: { id: 'ali_33', cat: 'arroz', nombre: 'Arroz blanco grano largo tailandés YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.90, imagen: './images/arroz.jpg' },
+  ali_24: { id: 'ali_24', cat: 'arroz', nombre: 'Arroz blanco de grano largo YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.65, imagen: './images/azucar.jpg' },
+  ali_33: { id: 'ali_33', cat: 'arroz', nombre: 'Arroz blanco grano largo tailandés YEYA (1 kg)', marca: 'YEYA', precioBaseUSD: 2.90, imagen: './images/azucar.jpg' },
 
   gra_1: { id: 'gra_1', cat: 'granos', nombre: 'Frijol blanco Penelas (500 g)', marca: 'Penelas', precioBaseUSD: 3.65, imagen: './images/granos.jpg' },
   gra_2: { id: 'gra_2', cat: 'granos', nombre: 'Arvejas verdes partidas / chícharos (500 g)', marca: 'Los Granos', precioBaseUSD: 2.30, imagen: './images/granos.jpg' },
@@ -426,7 +426,14 @@ bot.start(async (ctx) => {
   ctx.session.paso = null;
   const bannerPath = path.join(__dirname, 'images', 'banner.jpg');
   
-  const caption = "🇷🇺 ✈️ 🇨🇺 *COMBO-EXPRESS DESDE RUSIA* 🇨🇺\n━━━━━━━━━━━━━━━━━━━━━━━━━\n_Tus productos favoritos, calidad garantizada para tu familia._\n\n📍 *Destino:* `" + ctx.session.provincia + "`\n💱 *Moneda:* `" + ctx.session.moneda + "`\n\n👇 *Elige una opción:*";
+  const caption = "🇷🇺 ✈️ 🇨🇺 *COMBO-EXPRESS DESDE RUSIA* 🇨🇺
+━━━━━━━━━━━━━━━━━━━━━━━━━
+_Tus productos favoritos, calidad garantizada para tu familia._
+
+📍 *Destino:* `" + ctx.session.provincia + "`
+💱 *Moneda:* `" + ctx.session.moneda + "`
+
+👇 *Elige una opción:*";
 
   const teclado = Markup.inlineKeyboard([
     [Markup.button.callback('📍 Cambiar Provincia', 'menu_provincias'), Markup.button.callback('🛍️ Ver Catálogo', 'menu_categorias')],
@@ -493,13 +500,14 @@ bot.action('menu_categorias', (ctx) => {
   const filas = [];
   for (let i = 0; i < entradas.length; i += 2) {
     const fila = [Markup.button.callback(entradas[i][1], 'cat_' + entradas[i][0] + '_0')];
-    if (entradas[i + 1]) fila.push(Markup.button.callback(entradas[i + 1][1], 'cat_' + entradas[i + 1][0] + '_0'));
+    if (entradas[i + 1]) fila.push(Markup.button.callback(entradas[i + 1][1], 'cat_' + entradas[i + 1][1] + '_0'));
     filas.push(fila);
   }
   filas.push([Markup.button.callback('🛒 Ver Carrito', 'ver_carrito'), Markup.button.callback('📦 Mis Pedidos', 'mis_pedidos')]);
   filas.push([Markup.button.callback('🏠 Inicio', 'volver_inicio')]);
 
-  const catText = '🛍️ *SELECCIONA UNA CATEGORÍA*\n━━━━━━━━━━━━━━━━━━━━━━━━━';
+  const catText = '🛍️ *SELECCIONA UNA CATEGORÍA*
+━━━━━━━━━━━━━━━━━━━━━━━━━';
   ctx.editMessageText(catText, { parse_mode: 'Markdown', ...Markup.inlineKeyboard(filas) }).catch(() => {
     ctx.reply(catText, { parse_mode: 'Markdown', ...Markup.inlineKeyboard(filas) });
   });
@@ -520,7 +528,14 @@ bot.action(/cat_(.+)_(.+)/, async (ctx) => {
   const precio = obtenerPrecio(p, prov, mon);
   const cant = ctx.session.carrito[p.id] || 0;
 
-  const caption = '📦 *' + CATEGORIAS[catKey] + '* (' + (pagina + 1) + '/' + lista.length + ')\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🏷️ *' + p.nombre + '*\n🏭 Marca: `' + p.marca + '`\n💰 Precio: `' + precio + ' ' + mon + '`\n' + (cant > 0 ? '🛒 *Tienes ' + cant + ' en tu combo*\n' : '');
+  const caption = '📦 *' + CATEGORIAS[catKey] + '* (' + (pagina + 1) + '/' + lista.length + ')
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏷️ *' + p.nombre + '*
+🏭 Marca: `' + p.marca + '`
+💰 Precio: `' + precio + ' ' + mon + '`
+' + (cant > 0 ? '🛒 *Tienes ' + cant + ' en tu combo*
+' : '');
 
   const botones = [
     [
@@ -583,7 +598,14 @@ bot.context.emitirProducto = async function(ctx, catKey, pagina) {
   const precio = obtenerPrecio(p, prov, mon);
   const cant = ctx.session.carrito[p.id] || 0;
 
-  const caption = '📦 *' + CATEGORIAS[catKey] + '* (' + (pagina + 1) + '/' + lista.length + ')\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🏷️ *' + p.nombre + '*\n🏭 Marca: `' + p.marca + '`\n💰 Precio: `' + precio + ' ' + mon + '`\n' + (cant > 0 ? '🛒 *Tienes ' + cant + ' en tu combo*\n' : '');
+  const caption = '📦 *' + CATEGORIAS[catKey] + '* (' + (pagina + 1) + '/' + lista.length + ')
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏷️ *' + p.nombre + '*
+🏭 Marca: `' + p.marca + '`
+💰 Precio: `' + precio + ' ' + mon + '`
+' + (cant > 0 ? '🛒 *Tienes ' + cant + ' en tu combo*
+' : '');
 
   const botones = [
     [
@@ -626,17 +648,25 @@ bot.action('ver_carrito', async (ctx) => {
   const prov = ctx.session.provincia;
   const mon = ctx.session.moneda;
   let total = 0;
-  let texto = '🛒 *RESUMEN DE TU COMBO*\n📍 Destino: `' + prov + '`\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  let texto = '🛒 *RESUMEN DE TU COMBO*
+📍 Destino: `' + prov + '`
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+';
 
   ids.forEach(id => {
     const p = PRODUCTOS[id];
     const cant = ctx.session.carrito[id];
     const sub = Number((obtenerPrecio(p, prov, mon) * cant).toFixed(2));
     total += sub;
-    texto += '▫️ *' + cant + 'x* ' + p.nombre + '\n   ↳ Subtotal: `' + sub + ' ' + mon + '`\n\n';
+    texto += '▫️ *' + cant + 'x* ' + p.nombre + '
+   ↳ Subtotal: `' + sub + ' ' + mon + '`
+
+';
   });
 
-  texto += '━━━━━━━━━━━━━━━━━━━━━━━━━\n💳 *TOTAL A PAGAR:* `' + Number(total.toFixed(2)) + ' ' + mon + '`';
+  texto += '━━━━━━━━━━━━━━━━━━━━━━━━━
+💳 *TOTAL A PAGAR:* `' + Number(total.toFixed(2)) + ' ' + mon + '`';
 
   try { await ctx.deleteMessage(); } catch (e) {}
   ctx.reply(texto, {
@@ -657,7 +687,13 @@ bot.action('vaciar', (ctx) => {
 bot.action('checkout', (ctx) => {
   ctx.session.paso = 'esperando_datos';
   ctx.editMessageText(
-    '📦 *DATOS DE ENTREGA EN CUBA*\n━━━━━━━━━━━━━━━━━━━━━━━━━\nEscribe en un *único mensaje* los datos de tu familiar:\n\n1️⃣ Nombre completo\n2️⃣ Teléfono\n3️⃣ Provincia, Municipio y Dirección',
+    '📦 *DATOS DE ENTREGA EN CUBA*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+Escribe en un *único mensaje* los datos de tu familiar:
+
+1️⃣ Nombre completo
+2️⃣ Teléfono
+3️⃣ Provincia, Municipio y Dirección',
     { parse_mode: 'Markdown' }
   );
 });
@@ -678,8 +714,13 @@ bot.on('text', (ctx) => {
     ctx.session.totalCalculado = Number(total.toFixed(2));
 
     ctx.reply(
-      '💳 *SELECCIONA EL MÉTODO DE PAGO*\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-      '💰 *IMPORTE TOTAL A PAGAR:* `' + ctx.session.totalCalculado + ' ' + mon + '`\n\n' +
+      '💳 *SELECCIONA EL MÉTODO DE PAGO*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+' +
+      '💰 *IMPORTE TOTAL A PAGAR:* `' + ctx.session.totalCalculado + ' ' + mon + '`
+
+' +
       'Elige cómo deseas abonar tu pedido:',
       {
         parse_mode: 'Markdown',
@@ -704,16 +745,27 @@ metodosPagoValidos.forEach(metodo => {
 
     let instrucciones = '';
     if (metodo === 'RUB') {
-      instrucciones = '🇷🇺 *Instrucciones de Pago en Rublos (RUB):*\n• Importe exacto a transferir: `' + totalPagar + ' RUB`\n• SBP al número: `+79252481911` (Bancos: *T-Bank* o *VTB*)\n• Transferencia directa a tarjeta: `2200 7010 4388 5190`';
+      instrucciones = '🇷🇺 *Instrucciones de Pago en Rublos (RUB):*
+• Importe exacto a transferir: `' + totalPagar + ' RUB`
+• SBP al número: `+79252481911` (Bancos: *T-Bank* o *VTB*)
+• Transferencia directa a tarjeta: `2200 7010 4388 5190`';
     } else if (metodo === 'CUP' || metodo === 'MLC') {
-      instrucciones = '🇨🇺 *Instrucciones de Pago en Cuba (' + metodo + '):*\n• Importe exacto a transferir: `' + totalPagar + ' ' + mon + '`\n• Transferencia a tarjeta CUP: `9204 1299 7694 7558`\n• Confirmar pago al número en Cuba: *+5351849868*';
+      instrucciones = '🇨🇺 *Instrucciones de Pago en Cuba (' + metodo + '):*
+• Importe exacto a transferir: `' + totalPagar + ' ' + mon + '`
+• Transferencia a tarjeta CUP: `9204 1299 7694 7558`
+• Confirmar pago al número en Cuba: *+5351849868*';
     } else {
       instrucciones = '💳 *Método ' + metodo + ':* Importe a pagar: `' + totalPagar + ' ' + mon + '`. Contáctenos a nuestro WhatsApp para coordinar.';
     }
 
     await ctx.editMessageText(
-      '📸 *PASO FINAL: COMPROBANTE DE PAGO*\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-      instrucciones + '\n\n' +
+      '📸 *PASO FINAL: COMPROBANTE DE PAGO*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+' +
+      instrucciones + '
+
+' +
       '⚠️ *IMPORTANTE:* Por favor, toma una captura de pantalla de tu transferencia exitosa por el monto exacto de `' + totalPagar + ' ' + mon + '` y *envíala aquí como foto* al chat.',
       { parse_mode: 'Markdown' }
     );
@@ -734,7 +786,8 @@ bot.on('photo', async (ctx) => {
       const p = PRODUCTOS[id];
       const cant = ctx.session.carrito[id];
       const sub = Number((obtenerPrecio(p, prov, moneda) * cant).toFixed(2));
-      detalle += '- ' + cant + 'x ' + p.nombre + ' (' + sub + ' ' + moneda + ')\n';
+      detalle += '- ' + cant + 'x ' + p.nombre + ' (' + sub + ' ' + moneda + ')
+';
     });
 
     const ordenId = 'PED-' + Math.floor(1000 + Math.random() * 9000);
@@ -757,32 +810,47 @@ bot.on('photo', async (ctx) => {
     ctx.session.paso = null;
     ctx.session.carrito = {};
 
-    await bot.telegram.sendPhoto(ADMIN_CHAT_ID, fotoId, {
-      caption: 
-        '🚨 *NUEVO COMPROBANTE DE PAGO (' + ordenId + ')*\n' +
-        '━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-        '👤 Cliente: @' + (ctx.from.username || ctx.from.first_name) + ' (ID: `' + clienteId + '`)\n' +
-        '📍 Destino: ' + prov + '\n' +
-        '💳 Método: ' + metodo + ' | 💰 *Total:* `' + totalPagar + ' ' + moneda + '`\n\n' +
-        '🏠 *Entrega:*\n' + ctx.session.datosEntrega + '\n\n' +
-        '¿Aprobar este pago y registrar pedido?',
-      parse_mode: 'Markdown',
-      ...Markup.inlineKeyboard([
-        [
-          Markup.button.callback('✅ Aprobar Pago', 'aprobar_' + clienteId + '_' + ordenId),
-          Markup.button.callback('❌ Rechazar', 'rechazar_' + clienteId + '_' + ordenId)
-        ]
-      ])
-    });
+    try {
+      await bot.telegram.sendPhoto(ADMIN_CHAT_ID, fotoId, {
+        caption: 
+          '🚨 *NUEVO COMPROBANTE DE PAGO (' + ordenId + ')*
+' +
+          '━━━━━━━━━━━━━━━━━━━━━━━━━
+' +
+          '👤 Cliente: @' + (ctx.from.username || ctx.from.first_name) + ' (ID: `' + clienteId + '`)
+' +
+          '📍 Destino: ' + prov + '
+' +
+          '💳 Método: ' + metodo + ' | 💰 *Total:* `' + totalPagar + ' ' + moneda + '`
+
+' +
+          '🏠 *Entrega:*
+' + ctx.session.datosEntrega + '
+
+' +
+          '¿Aprobar este pago y registrar pedido?',
+        parse_mode: 'Markdown',
+        ...Markup.inlineKeyboard([
+          [
+            Markup.button.callback('✅ Aprobar Pago', 'aprobar_' + clienteId + '_' + ordenId),
+            Markup.button.callback('❌ Rechazar', 'rechazar_' + clienteId + '_' + ordenId)
+          ]
+        ])
+      });
+    } catch (err) {
+      console.log("Error al enviar foto al grupo admin (Verifica que ADMIN_CHAT_ID sea un número de grupo válido y el bot sea admin):", err);
+    }
 
     await ctx.reply(
-      '⏳ *¡Pedido ' + ordenId + ' registrado y comprobante enviado!*\n\n' +
+      '⏳ *¡Pedido ' + ordenId + ' registrado y comprobante enviado!*
+
+' +
       'Puedes revisar el estado actual de tu compra en cualquier momento haciendo clic en el botón *📦 Mis Pedidos* en el menú principal.',
       {
         parse_mode: 'Markdown',
         ...Markup.inlineKeyboard([
           [Markup.button.callback('📦 Ver Mis Pedidos', 'mis_pedidos')],
-          [Markup.button.callback('🏠 Menú Principal', 'volver_inicio')]
+          [Markup.button.callback('📦 Menú Principal', 'volver_inicio')]
         ])
       }
     );
@@ -797,13 +865,21 @@ bot.action('mis_pedidos', async (ctx) => {
     return ctx.answerCbQuery('📦 No tienes ningún pedido registrado todavía.', { show_alert: true });
   }
 
-  let texto = '📦 *TUS PEDIDOS REALIZADOS*\n━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  let texto = '📦 *TUS PEDIDOS REALIZADOS*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+';
   pedidos.forEach(ped => {
-    texto += '🔹 *Pedido:* `' + ped.id + '`\n' +
-             '💰 *Total:* `' + ped.total + '`\n' +
-             '📊 *Estado:* ' + ped.estado + '\n' +
-             '📅 *Fecha:* ' + ped.fecha + '\n' +
-             '-----------------------------------\n';
+    texto += '🔹 *Pedido:* `' + ped.id + '`
+' +
+             '💰 *Total:* `' + ped.total + '`
+' +
+             '📊 *Estado:* ' + ped.estado + '
+' +
+             '📅 *Fecha:* ' + ped.fecha + '
+' +
+             '-----------------------------------
+';
   });
 
   try { await ctx.deleteMessage(); } catch (e) {}
@@ -832,25 +908,35 @@ bot.action(/aprobar_(.+)_(.+)/, async (ctx) => {
   try {
     await bot.telegram.sendMessage(
       clienteId,
-      '🎉 *¡PAGO VERIFICADO Y PEDIDO APROBADO!* 🎉\n' +
-      '━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-      'Tu pedido *' + ordenId + '* ha sido confirmado por administración.\n\n' +
-      '📊 Estado actual: *En preparación / Procesando envío*.\n' +
+      '🎉 *¡PAGO VERIFICADO Y PEDIDO APROBADO!* 🎉
+' +
+      '━━━━━━━━━━━━━━━━━━━━━━━━━
+' +
+      'Tu pedido *' + ordenId + '* ha sido confirmado por administración.
+
+' +
+      '📊 Estado actual: *En preparación / Procesando envío*.
+' +
       'A continuación te enviamos tu **Factura Oficial en PDF**.',
       { parse_mode: 'Markdown' }
     );
 
     if (pedidoInfo) {
       generarFacturaPDF(ordenId, pedidoInfo.nombreCliente || 'Cliente', pedidoInfo.provincia, pedidoInfo.metodo, pedidoInfo.total, pedidoInfo.detalle, async (pdfPath) => {
-        await bot.telegram.sendDocument(clienteId, { source: pdfPath, filename: 'Factura_' + ordenId + '.pdf' }, {
-          caption: '📄 Aquí tienes tu comprobante y factura digital oficial de compra.'
-        });
-        try { fs.unlinkSync(pdfPath); } catch (err) {}
+        try {
+          await bot.telegram.sendDocument(clienteId, { source: pdfPath, filename: 'Factura_' + ordenId + '.pdf' }, {
+            caption: '📄 Aquí tienes tu comprobante y factura digital oficial de compra.'
+          });
+          fs.unlinkSync(pdfPath);
+        } catch (docErr) {
+          console.log("Error al enviar documento PDF:", docErr);
+        }
       });
     }
 
     await ctx.editMessageCaption(
-      '✅ *Orden ' + ordenId + ' Aprobada con Factura PDF enviada.*\nSelecciona el siguiente avance para notificar al cliente:',
+      '✅ *Orden ' + ordenId + ' Aprobada con Factura PDF enviada.*
+Selecciona el siguiente avance para notificar al cliente:',
       {
         parse_mode: 'Markdown',
         ...Markup.inlineKeyboard([
@@ -873,7 +959,8 @@ bot.action(/camino_(.+)_(.+)/, async (ctx) => {
     if (ped) ped.estado = '🚚 En camino / Transportando';
   }
 
-  await bot.telegram.sendMessage(clienteId, '🚚 *¡Actualización de Envío!*\nTu pedido *' + ordenId + '* ya va en camino hacia el destino en Cuba.', { parse_mode: 'Markdown' });
+  await bot.telegram.sendMessage(clienteId, '🚚 *¡Actualización de Envío!*
+Tu pedido *' + ordenId + '* ya va en camino hacia el destino en Cuba.', { parse_mode: 'Markdown' });
   await ctx.editMessageCaption('🚚 *Orden ' + ordenId + ' marcada como "En camino".*', {
     parse_mode: 'Markdown',
     ...Markup.inlineKeyboard([
@@ -893,10 +980,16 @@ bot.action(/entregado_(.+)_(.+)/, async (ctx) => {
 
   await bot.telegram.sendMessage(
     clienteId, 
-    '✅ *¡PEDIDO ENTREGADO!* ✅\n' +
-    '━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-    'Te informamos que tu pedido *' + ordenId + '* ha sido entregado exitosamente a tu familiar en Cuba.\n\n' +
-    '¡Gracias por confiar en nosotros! Puedes ver el historial completo en *📦 Mis Pedidos*.\n\n' +
+    '✅ *¡PEDIDO ENTREGADO!* ✅
+' +
+    '━━━━━━━━━━━━━━━━━━━━━━━━━
+' +
+    'Te informamos que tu pedido *' + ordenId + '* ha sido entregado exitosamente a tu familiar en Cuba.
+
+' +
+    '¡Gracias por confiar en nosotros! Puedes ver el historial completo en *📦 Mis Pedidos*.
+
+' +
     '🇷🇺 ✈️ 🇨🇺 *¡Esperamos tu próxima compra!*',
     { parse_mode: 'Markdown' }
   );
